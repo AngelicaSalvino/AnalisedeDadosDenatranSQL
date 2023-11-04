@@ -27,7 +27,7 @@ WITH DadosPorAno AS (
         ano,
         SUM(total) AS total_veiculos
     FROM denatran_frota_municipio_tipo
-    WHERE ano BETWEEN 2003 AND 2020
+    WHERE ano BETWEEN 2003 AND 2020 AND mes = 12
     GROUP BY regiao, ano
 )
 SELECT
@@ -37,6 +37,32 @@ SELECT
     ROUND(100.0 * (total_veiculos - LAG(total_veiculos) OVER (PARTITION BY regiao ORDER BY ano)) / LAG(total_veiculos) OVER (PARTITION BY regiao ORDER BY ano), 0) AS variacao_percentual
 FROM DadosPorAno
 ORDER BY regiao, ano;
+
+
+--Retorna o total de veículos por estado no ano de 2020, 
+--considerando a soma do total de veículos registrados no mês 12
+
+WITH DadosAno AS (
+    SELECT
+        CASE
+            WHEN sigla_uf IN ('AM', 'PA', 'RR', 'RO', 'AC', 'TO', 'AP') THEN 'Região Norte'
+            WHEN sigla_uf IN ('MA', 'PI', 'PE', 'RN', 'SE', 'BA', 'PB', 'CE', 'AL') THEN 'Região Nordeste'
+            WHEN sigla_uf IN ('MT', 'MS', 'GO', 'DF') THEN 'Região Centro-Oeste'
+            WHEN sigla_uf IN ('MG', 'SP', 'RJ', 'ES') THEN 'Região Sudeste'
+            WHEN sigla_uf IN ('PR', 'SC', 'RS') THEN 'Região Sul'
+            ELSE 'Outro'
+        END AS regiao,
+        sigla_uf AS estado,
+        SUM(automovel + caminhao + chassiplataforma + caminhaotrator + caminhonete + camioneta + utilitario + tratoresteira + tratorrodas + onibus + microonibus + reboque + semireboque) AS Total_Veiculos
+    FROM denatran_frota_municipio_tipo
+    WHERE ano = 2020 AND mes = 12
+    GROUP BY regiao, estado
+)
+SELECT
+    regiao,
+    estado,
+    Total_Veiculos DESC
+FROM DadosAno;
 
 
 -- Cálculos estatísticos da distribuição de veículos por estado e município, sendo eles: 
@@ -508,6 +534,7 @@ SELECT
 FROM DadosPorAno
 GROUP BY regiao, ano
 ORDER BY regiao, ano;
+
 
 
 
