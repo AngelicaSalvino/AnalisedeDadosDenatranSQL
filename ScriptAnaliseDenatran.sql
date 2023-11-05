@@ -64,6 +64,42 @@ SELECT
     Total_Veiculos DESC
 FROM DadosAno;
 
+--Quais grupos de veículos têm maior representatividade por regiões geográficas e estados?
+--Considerando apenas o ano de 2020.
+
+WITH DadosPorRegiaoEstado AS (
+    SELECT
+        CASE
+            WHEN sigla_uf IN ('AM', 'PA', 'RR', 'RO', 'AC', 'TO', 'AP') THEN 'Região Norte'
+            WHEN sigla_uf IN ('MA', 'PI', 'PE', 'RN', 'SE', 'BA', 'PB', 'CE', 'AL') THEN 'Região Nordeste'
+            WHEN sigla_uf IN ('MT', 'MS', 'GO', 'DF') THEN 'Região Centro-Oeste'
+            WHEN sigla_uf IN ('MG', 'SP', 'RJ', 'ES') THEN 'Região Sudeste'
+            WHEN sigla_uf IN ('PR', 'SC', 'RS') THEN 'Região Sul'
+            ELSE 'Outro'
+        END AS regiao,
+        sigla_uf AS estado,
+        ano,
+        SUM(automovel) AS Veiculos_de_Passeio,
+        SUM(caminhao + chassiplataforma + caminhaotrator + caminhonete + camioneta + utilitario + tratoresteira + tratorrodas + reboque + semireboque) AS Veiculos_de_Carga,
+        SUM(motocicleta + motoneta) AS Motocicletas,
+        SUM(onibus + microonibus) AS Veiculos_Passageiros,
+        SUM(quadriciclo + triciclo + sidecar) AS Veiculos_Especiais
+    FROM denatran_frota_municipio_tipo
+   WHERE ano = 2020 AND mes = 12
+    GROUP BY regiao, estado, ano
+)
+SELECT
+    regiao,
+    estado,
+    ano,
+    MAX(Veiculos_de_Passeio) AS Veiculos_de_Passeio,
+    MAX(Veiculos_de_Carga) AS Veiculos_de_Carga,
+    MAX(Motocicletas) AS Motocicletas,
+    MAX(Veiculos_Passageiros) AS Veiculos_Passageiros,
+    MAX(Veiculos_Especiais) AS Veiculos_Especiais
+FROM DadosPorRegiaoEstado
+GROUP BY regiao, estado, ano
+ORDER BY regiao, estado, ano;
 
 -- Cálculos estatísticos da distribuição de veículos por estado e município, sendo eles: 
 --Total de Veículos, Média de Veículos, Mediana de Veículos, Min Veículos e Máximo de Veículos
@@ -534,6 +570,7 @@ SELECT
 FROM DadosPorAno
 GROUP BY regiao, ano
 ORDER BY regiao, ano;
+
 
 
 
