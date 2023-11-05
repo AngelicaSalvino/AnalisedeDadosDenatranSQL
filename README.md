@@ -15,7 +15,7 @@ O projeto inclui as seguintes informações:
 - `apresentacao`: Inclui os slides de apresentação em PowerPoint.
 - `documentacao`: Contém informações detalhadas sobre a análise, propostas e resultados.
 - `imagens`: Guarda imagens usadas na documentação e apresentação.
-- `analise`: Contém as queries SQLs utilizadas na análise (Programa utilizado: Dbeaver-SQLite)
+- `scripts`: Contém as queries SQLs utilizadas na análise (Programa utilizado: Dbeaver-SQLite)
 - `propostas`: Contém as propostas em formato de documento.
 
 ## Como Contribuir
